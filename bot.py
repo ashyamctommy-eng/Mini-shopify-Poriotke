@@ -219,7 +219,7 @@ async def remove_premium_user(user_id):
 
 def generate_key():
     random_part = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=15))
-    return f"AFUONA_{random_part}"
+    return f"PORIOT_{random_part}"
 
 async def load_keys():
     if not os.path.exists(KEYS_FILE):
@@ -1649,13 +1649,13 @@ async def add_sites_command(event):
     if user_id not in ADMIN_ID:
         return
     if not event.reply_to_msg_id:
-        await event.reply(premium_emoji("📝 Pʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ .ᴛxᴛ ғɪʟᴇ ᴡɪᴛʜ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅ:\n<code>/addsites</code>"), parse_mode='html')
+        await event.reply(premium_emoji("📝 Pʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ 🇦 .ᴛxᴛ ғɪʟᴇ 🇼ɪᴛ🇭 🇹🇭🇪 🇨🇴🇲🇲🇦🇳🇩:\n<code>/addsites</code>"), parse_mode='html')
         return
     reply_msg = await event.get_reply_message()
     if not reply_msg.file or not reply_msg.file.name.endswith('.txt'):
-        await event.reply(premium_emoji("❌ Pʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴀ .ᴛxᴛ ғɪʟᴇ."), parse_mode='html')
+        await event.reply(premium_emoji("❌ Pʟᴇᴀsᴇ 🇷🇪🇵🇱🇾 🇹🇴 🇦 .ᴛxᴛ ғɪ🇱🇪."), parse_mode='html')
         return
-    status_msg = await event.reply(premium_emoji("🔄 Pʀᴏᴄᴇssɪɴɢ sɪᴛᴇs ғɪʟᴇ..."), parse_mode='html')
+    status_msg = await event.reply(premium_emoji("🔄 P🇷🇴🇨🇪🇸🇸🇮🇳🇬 sɪᴛᴇs ғɪ🇱🇪..."), parse_mode='html')
     try:
         file_path = await reply_msg.download_media()
         async with aiofiles.open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -1663,43 +1663,30 @@ async def add_sites_command(event):
             sites = [line.strip() for line in content.splitlines() if line.strip()]
         os.remove(file_path)
         if not sites:
-            await status_msg.edit(premium_emoji("❌ Nᴏ ᴠᴀʟɪᴅ sɪᴛᴇs ғᴏᴜɴᴅ ɪɴ ғɪʟᴇ."), parse_mode='html')
+            await status_msg.edit(premium_emoji("❌ Nᴏ 🇻🇦🇱🇮🇩 sɪᴛᴇs 🇫🇴🇺🇳🇩 🇮🇳 🇫🇮🇱🇪."), parse_mode='html')
             return
-        await status_msg.edit(premium_emoji(f"🔄 Cʜᴇᴄᴋɪɴɢ {len(sites)} sɪᴛᴇs ʙᴇғᴏʀᴇ ᴀᴅᴅɪɴɢ..."), parse_mode='html')
-        proxies = load_proxies()
-        if not proxies:
-            await status_msg.edit(premium_emoji("❌ Nᴏ ᴘʀᴏxɪᴇs ᴀᴠᴀɪʟᴀʙʟᴇ ᴛᴏ ᴛᴇsᴛ sɪᴛᴇs."), parse_mode='html')
-            return
-        alive_sites = []
-        dead_sites = []
-        sites_with_price = []
-        batch_size = 10
-        for i in range(0, len(sites), batch_size):
-            batch = sites[i:i + batch_size]
-            tasks = [test_site_with_price(site, random.choice(proxies)) for site in batch]
-            results = await asyncio.gather(*tasks)
-            for res in results:
-                if res['status'] == 'alive':
-                    alive_sites.append(res['site'])
-                    sites_with_price.append({'url': res['site'], 'price': res.get('price', 0.0)})
-                else:
-                    dead_sites.append(res['site'])
-            await status_msg.edit(premium_emoji(f"🔄 Cʜᴇᴄᴋɪɴɢ sɪᴛᴇs...\n\nCʜᴇᴄᴋᴇᴅ: {len(alive_sites) + len(dead_sites)}/{len(sites)}\n✅ Aʟɪᴠᴇ: {len(alive_sites)}\n❌ Dᴇᴀᴅ: {len(dead_sites)}"), parse_mode='html')
+
+        # FORCE ALL SITES AS ALIVE WITH DEFAULT PRICE 1.00 (Bypasses proxy/Cloudflare check)
+        alive_sites = sites
+        sites_with_price = [{'url': site, 'price': 1.00} for site in sites]
+
+        # Save directly to sites.txt
         async with aiofiles.open(SITES_FILE, 'w') as f:
             for site in alive_sites:
                 await f.write(f"{site}\n")
-        await save_sites_with_price(sites_with_price)
-        result_text = f"""✅ <b>Sɪᴛᴇs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</b>
 
-📊 Tᴏᴛᴀʟ sɪᴛᴇs ʀᴇᴄᴇɪᴠᴇᴅ: {len(sites)}
-✅ Aʟɪᴠᴇ (ᴀᴅᴅᴇᴅ): {len(alive_sites)}
-❌ Dᴇᴀᴅ (ɪɢɴᴏʀᴇᴅ): {len(dead_sites)}
+        # Save directly to prices JSON
+        await save_sites_with_price(sites_with_price)
+
+        result_text = f"""✅ <b>Sɪᴛᴇs ᴜᴘᴅᴀᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ! (Bypassed Check)</b>
+
+📊 Tᴏᴛᴀʟ sɪᴛᴇs ᴀᴅᴅᴇᴅ: {len(alive_sites)}
 
 🌐 <b>Aᴅᴅᴇᴅ sɪᴛᴇs:</b>
 {chr(10).join([f"• {s}" for s in alive_sites[:5]])}{'...' if len(alive_sites) > 5 else ''}"""
         await status_msg.edit(premium_emoji(result_text), parse_mode='html')
     except Exception as e:
-        await status_msg.edit(premium_emoji(f"❌ Eʀʀᴏʀ: {e}"), parse_mode='html')
+        await status_msg.edit(premium_emoji(f"❌ Eʀʀ🇴🇷: {e}"), parse_mode='html')
 
 @bot.on(events.NewMessage(pattern='/addpremium'))
 async def add_premium_command(event):
